@@ -1,8 +1,9 @@
-
-openapi: 3.0.0
+openapi: 3.1.0
 info:
   title: RIG Calendar API
   version: 1.0.0
+servers:
+  - url: https://rig-calendar.vercel.app
 paths:
   /api:
     post:
@@ -23,7 +24,7 @@ paths:
                 - start_date
                 - end_date
       responses:
-        '200':
+        "200":
           description: Lista de horarios disponibles
           content:
             application/json:
