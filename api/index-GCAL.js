@@ -1,7 +1,6 @@
-
 const { google } = require("googleapis");
 
-module.exports = async function handler(req, res) {
+const handler = async function (req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método no permitido" });
   }
@@ -68,3 +67,5 @@ module.exports = async function handler(req, res) {
     res.status(500).json({ error: "Error consultando Google Calendar" });
   }
 };
+
+export default handler;
