@@ -1,7 +1,7 @@
 
-import { google } from "googleapis";
+const { google } = require("googleapis");
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método no permitido" });
   }
@@ -22,17 +22,16 @@ export default async function handler(req, res) {
 
     const calendar = google.calendar({ version: "v3", auth });
 
-    const calendarId = "primary";
     const events = await calendar.freebusy.query({
       requestBody: {
         timeMin: new Date(start_date).toISOString(),
         timeMax: new Date(end_date).toISOString(),
         timeZone: "America/Santiago",
-        items: [{ id: calendarId }],
+        items: [{ id: "primary" }],
       },
     });
 
-    const busyTimes = events.data.calendars[calendarId].busy;
+    const busyTimes = events.data.calendars["primary"].busy;
 
     const availableAppointments = [];
     const appointmentTimes = ["10:00", "11:00", "12:00", "15:00", "16:00", "17:00"];
@@ -68,4 +67,4 @@ export default async function handler(req, res) {
     console.error("Error consultando Google Calendar:", error);
     res.status(500).json({ error: "Error consultando Google Calendar" });
   }
-}
+};
