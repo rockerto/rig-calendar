@@ -1,2 +1,2 @@
-import handler from "./index-GCAL.js";
-export default handler;
+const handler = require("./index-GCAL.cjs");
+module.exports = handler;
