@@ -1,16 +1,10 @@
 {
-  "version": 2,
-  "builds": [
+  "public": true,
+  "cleanUrls": true,
+  "rewrites": [
     {
-      "src": "api/index.cjs",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api",
-      "methods": ["POST"],
-      "dest": "api/index.cjs"
+      "source": "/.well-known/ai-plugin.json",
+      "destination": "/public/.well-known/ai-plugin.json"
     }
   ]
 }
