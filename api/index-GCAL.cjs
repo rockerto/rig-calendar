@@ -21,15 +21,15 @@ const handler = async function (req, res) {
 
     const calendar = google.calendar({ version: "v3", auth });
 
-    // Convertir fechas
-    const start = new Date(start_date);
-    const end = new Date(end_date);
-    end.setDate(end.getDate() + 1); // 🔧 FIX: Sumar un día al timeMax
+    // Ajuste: aseguramos que timeMax sea al final del día
+    const startDateISO = new Date(start_date + "T00:00:00").toISOString();
+    const endDate = new Date(end_date + "T23:59:59");
+    const endDateISO = endDate.toISOString();
 
     const events = await calendar.freebusy.query({
       requestBody: {
-        timeMin: start.toISOString(),
-        timeMax: end.toISOString(),
+        timeMin: startDateISO,
+        timeMax: endDateISO,
         timeZone: "America/Santiago",
         items: [{ id: "primary" }],
       },
@@ -39,8 +39,10 @@ const handler = async function (req, res) {
 
     const availableAppointments = [];
     const appointmentTimes = ["10:00", "11:00", "12:00", "15:00", "16:00", "17:00"];
+    const start = new Date(start_date);
+    const end = new Date(end_date);
 
-    for (let day = new Date(start); day < end; day.setDate(day.getDate() + 1)) {
+    for (let day = new Date(start); day <= end; day.setDate(day.getDate() + 1)) {
       const dateStr = day.toISOString().split("T")[0];
       for (let time of appointmentTimes) {
         const [hour, minute] = time.split(":");
