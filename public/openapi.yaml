@@ -1,0 +1,59 @@
+openapi: 3.0.0
+info:
+  title: RIG Calendar Bot API
+  version: "1.0"
+  description: API para consultar y agendar horas de sesiones 
+quiroprácticas en RIG.
+servers:
+  - url: https://rig-calendar.vercel.app
+paths:
+  /api:
+    post:
+      operationId: getAvailableAppointments
+      summary: Consulta disponibilidad horaria
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                start_date:
+                  type: string
+                  format: date
+                end_date:
+                  type: string
+                  format: date
+      responses:
+        "200":
+          description: Lista de horarios disponibles
+  /api/book-appointment:
+    post:
+      operationId: bookAppointment
+      summary: Agenda una hora en el calendario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                time:
+                  type: string
+                patient:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    rut:
+                      type: string
+                    phone:
+                      type: string
+                    email:
+                      type: string
+      responses:
+        "200":
+          description: Evento creado correctamente
+
