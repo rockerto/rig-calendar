@@ -8,13 +8,13 @@ const handler = async function (req, res) {
   const { start_date, end_date } = req.body;
 
   try {
-    const credentials = JSON.parse(process.env.GOOGLE_CLIENT_SECRET_JSON);
+    const { client_id, client_secret, redirect_uris } = JSON.parse(process.env.GOOGLE_CLIENT_SECRET_JSON).installed;
     const token = JSON.parse(process.env.GOOGLE_TOKEN_JSON);
 
     const auth = new google.auth.OAuth2(
-      credentials.web.client_id,
-      credentials.web.client_secret,
-      credentials.web.redirect_uris[0]
+      client_id,
+      client_secret,
+      redirect_uris[0]
     );
 
     auth.setCredentials(token);
@@ -68,4 +68,4 @@ const handler = async function (req, res) {
   }
 };
 
-export default handler;
+module.exports = handler;
