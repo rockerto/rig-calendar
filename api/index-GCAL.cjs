@@ -8,23 +8,28 @@ const handler = async function (req, res) {
   const { start_date, end_date } = req.body;
 
   try {
-    const { client_id, client_secret, redirect_uris } = JSON.parse(process.env.GOOGLE_CLIENT_SECRET_JSON).installed;
+    const credentials = JSON.parse(process.env.GOOGLE_CLIENT_SECRET_JSON);
     const token = JSON.parse(process.env.GOOGLE_TOKEN_JSON);
 
     const auth = new google.auth.OAuth2(
-      client_id,
-      client_secret,
-      redirect_uris[0]
+      credentials.web.client_id,
+      credentials.web.client_secret,
+      credentials.web.redirect_uris[0]
     );
 
     auth.setCredentials(token);
 
     const calendar = google.calendar({ version: "v3", auth });
 
+    // Convertir fechas
+    const start = new Date(start_date);
+    const end = new Date(end_date);
+    end.setDate(end.getDate() + 1); // 🔧 FIX: Sumar un día al timeMax
+
     const events = await calendar.freebusy.query({
       requestBody: {
-        timeMin: new Date(start_date).toISOString(),
-        timeMax: new Date(end_date).toISOString(),
+        timeMin: start.toISOString(),
+        timeMax: end.toISOString(),
         timeZone: "America/Santiago",
         items: [{ id: "primary" }],
       },
@@ -34,10 +39,8 @@ const handler = async function (req, res) {
 
     const availableAppointments = [];
     const appointmentTimes = ["10:00", "11:00", "12:00", "15:00", "16:00", "17:00"];
-    const start = new Date(start_date);
-    const end = new Date(end_date);
 
-    for (let day = new Date(start); day <= end; day.setDate(day.getDate() + 1)) {
+    for (let day = new Date(start); day < end; day.setDate(day.getDate() + 1)) {
       const dateStr = day.toISOString().split("T")[0];
       for (let time of appointmentTimes) {
         const [hour, minute] = time.split(":");
@@ -68,4 +71,4 @@ const handler = async function (req, res) {
   }
 };
 
-module.exports = handler;
+export default handler;
