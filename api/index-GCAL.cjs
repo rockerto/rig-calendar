@@ -18,43 +18,44 @@ const handler = async function (req, res) {
     );
 
     auth.setCredentials(token);
-
     const calendar = google.calendar({ version: "v3", auth });
 
-    // Ajuste: aseguramos que timeMax sea al final del día
-    const startDateISO = new Date(start_date + "T00:00:00").toISOString();
-    const endDate = new Date(end_date + "T23:59:59");
-    const endDateISO = endDate.toISOString();
+    const timeMin = new Date(start_date);
+    const timeMax = new Date(end_date);
+    timeMax.setDate(timeMax.getDate() + 1); // 🔧 IMPORTANTE: incluye el día completo
 
     const events = await calendar.freebusy.query({
       requestBody: {
-        timeMin: startDateISO,
-        timeMax: endDateISO,
+        timeMin: timeMin.toISOString(),
+        timeMax: timeMax.toISOString(),
         timeZone: "America/Santiago",
         items: [{ id: "primary" }],
       },
     });
 
     const busyTimes = events.data.calendars["primary"].busy;
+    const appointmentTimes = [
+      "10:00", "10:30", "11:00", "11:30",
+      "12:00", "12:30", "15:00", "15:30",
+      "16:00", "16:30", "17:00", "17:30"
+    ];
 
     const availableAppointments = [];
-    const appointmentTimes = ["10:00", "11:00", "12:00", "15:00", "16:00", "17:00"];
-    const start = new Date(start_date);
-    const end = new Date(end_date);
+    const current = new Date(timeMin);
+    const last = new Date(timeMax);
 
-    for (let day = new Date(start); day <= end; day.setDate(day.getDate() + 1)) {
+    for (let day = new Date(current); day < last; day.setDate(day.getDate() + 1)) {
       const dateStr = day.toISOString().split("T")[0];
-      for (let time of appointmentTimes) {
-        const [hour, minute] = time.split(":");
+      for (const time of appointmentTimes) {
+        const [hour, minute] = time.split(":").map(Number);
         const startDateTime = new Date(day);
-        startDateTime.setHours(parseInt(hour), parseInt(minute), 0, 0);
+        startDateTime.setHours(hour, minute, 0, 0);
         const endDateTime = new Date(startDateTime);
         endDateTime.setMinutes(endDateTime.getMinutes() + 30);
 
-        const overlap = busyTimes.some(
-          (busy) =>
-            new Date(busy.start) < endDateTime &&
-            new Date(busy.end) > startDateTime
+        const overlap = busyTimes.some(busy =>
+          new Date(busy.start) < endDateTime &&
+          new Date(busy.end) > startDateTime
         );
 
         if (!overlap) {
