@@ -1,76 +1,59 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: RIG Calendar Bot
-  description: Permite consultar disponibilidad y agendar horas con RIG en Copiapó.
+  description: API para consultar y agendar sesiones quiroprácticas con RIG.
   version: "1.0.0"
 servers:
   - url: https://rig-calendar.vercel.app
 paths:
-  /api/index-GCAL.cjs:
+  /api:
     post:
+      summary: Obtener horas disponibles
       operationId: getAvailableAppointments
-      summary: Obtener disponibilidad de horas
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AvailabilityRequest"
+              type: object
+              properties:
+                start_date:
+                  type: string
+                  example: "2025-04-11"
+                end_date:
+                  type: string
+                  example: "2025-04-11"
       responses:
-        "200":
+        '200':
           description: Lista de horas disponibles
   /api/book-appointment:
     post:
+      summary: Agendar una cita
       operationId: bookAppointment
-      summary: Agendar una cita en el calendario
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/BookingRequest"
+              type: object
+              properties:
+                date:
+                  type: string
+                  example: "2025-04-14"
+                time:
+                  type: string
+                  example: "15:00"
+                patient:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    rut:
+                      type: string
+                    phone:
+                      type: string
+                    email:
+                      type: string
       responses:
-        "200":
-          description: Confirmación de la hora agendada
-components:
-  schemas:
-    AvailabilityRequest:
-      type: object
-      properties:
-        start_date:
-          type: string
-          format: date
-        end_date:
-          type: string
-          format: date
-      required:
-        - start_date
-        - end_date
-    BookingRequest:
-      type: object
-      properties:
-        date:
-          type: string
-          format: date
-        time:
-          type: string
-        patient:
-          type: object
-          properties:
-            name:
-              type: string
-            rut:
-              type: string
-            phone:
-              type: string
-            email:
-              type: string
-          required:
-            - name
-            - rut
-            - phone
-            - email
-      required:
-        - date
-        - time
-        - patient
+        '200':
+          description: Confirmación de cita
