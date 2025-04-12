@@ -6,7 +6,7 @@ info:
 servers:
   - url: https://rig-calendar.vercel.app
 paths:
-  /api/index-GCAL:
+  /api/index-GCAL.cjs:
     post:
       operationId: getAvailableAppointments
       summary: Obtener disponibilidad de horas
