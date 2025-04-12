@@ -23,7 +23,7 @@ const getAvailableAppointments = async (req, res) => {
 
     const start = new Date(start_date);
     const end = new Date(end_date);
-    end.setDate(end.getDate() + 1); // Fix para evitar rango vacío
+    end.setDate(end.getDate() + 1); // Para evitar error por rango vacío
 
     const events = await calendar.freebusy.query({
       requestBody: {
