@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: RIG Calendar API
-  description: API para consultar y agendar horas con RIG en Copiapó.
+  description: API para consultar y agendar horas con RIG.
   version: 1.0.0
 servers:
   - url: https://rig-calendar.vercel.app
@@ -24,8 +24,7 @@ paths:
       responses:
         '200':
           description: Lista de horas disponibles
-
-  /api/book:
+  /api/bookAppointment:
     post:
       summary: Agendar una cita
       operationId: bookAppointment
