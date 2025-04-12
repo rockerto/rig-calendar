@@ -73,4 +73,6 @@ const getAvailableAppointments = async (req, res) => {
   }
 };
 
-module.exports = getAvailableAppointments;
+module.exports = async (req, res) => {
+  return getAvailableAppointments(req, res);
+};
