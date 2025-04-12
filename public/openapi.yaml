@@ -8,7 +8,7 @@ servers:
 paths:
   /api:
     post:
-      summary: Obtener disponibilidad o agendar una cita
+      summary: Operaciones del calendario
       operationId: getAvailableAppointments
       requestBody:
         required: true
@@ -24,9 +24,7 @@ paths:
       responses:
         '200':
           description: Lista de horas disponibles
-
-  /api:
-    post:
+    put:
       summary: Agendar una cita
       operationId: bookAppointment
       requestBody:
