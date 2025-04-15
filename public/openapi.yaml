@@ -6,7 +6,7 @@ info:
 servers:
   - url: https://rig-calendar.vercel.app
 paths:
-  /api/getAvailableAppointments:
+    /api/getavailableappointments:
     post:
       summary: Obtener disponibilidad de horas
       operationId: getAvailableAppointments
@@ -24,7 +24,7 @@ paths:
       responses:
         '200':
           description: Lista de horas disponibles
-  /api/book-appointment:
+  /api/bookappointment:
     post:
       summary: Agendar una cita
       operationId: bookAppointment
