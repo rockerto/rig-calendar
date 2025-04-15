@@ -1,0 +1,6 @@
+node_modules/
+.DS_Store
+token.json
+client_secret.json
+authorize.cjs
+package-lock.json
