@@ -1,0 +1,10 @@
+{
+  "public": true,
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/.well-known/ai-plugin.json",
+      "destination": "/public/.well-known/ai-plugin.json"
+    }
+  ]
+}
