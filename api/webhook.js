@@ -1,5 +1,7 @@
 // api/webhook.js
 
+import { logRigEvent } from './riglog.js';
+
 export default async function handler(req, res) {
   if (req.method === 'GET') {
     const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
@@ -18,8 +20,21 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    console.log('📥 Mensaje recibido desde WhatsApp:', JSON.stringify(req.body, null, 2));
-    // Aquí podrías procesar el mensaje y hacer que Rigbot responda
+    const mensajeRecibido = req.body;
+
+    console.log('📥 Mensaje recibido desde WhatsApp:', JSON.stringify(mensajeRecibido, null, 2));
+
+    // Registrar en el log interno
+    await logRigEvent({
+      tipo: 'mensaje_entrante',
+      mensaje: JSON.stringify(mensajeRecibido),
+      resultado: 'recibido',
+      paciente: '',
+      telefono: '',
+      hora_solicitada: '',
+      observaciones: 'Webhook activo'
+    });
+
     return res.sendStatus(200);
   }
 
