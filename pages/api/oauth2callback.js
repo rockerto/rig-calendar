@@ -1,4 +1,4 @@
-// /pages/api/oauth2callback.js
+import { google } from 'googleapis';
 
 export default async function handler(req, res) {
   const { code } = req.query;
@@ -8,8 +8,24 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Aquí normalmente intercambiaríamos el "code" por un token de acceso
-  // usando GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET.
+  const oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    'https://rig-calendar.vercel.app/api/oauth2callback'
+  );
 
-  res.status(200).send('OAuth callback received. Code: ' + code);
+  try {
+    const { tokens } = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(tokens);
+
+    // Para propósitos de prueba: mostrar el token recibido
+    res.status(200).json({
+      message: 'Token recibido exitosamente 🎉',
+      tokens
+    });
+
+  } catch (error) {
+    console.error('Error al intercambiar el código:', error);
+    res.status(500).json({ error: 'Error al intercambiar el código' });
+  }
 }
