@@ -18,7 +18,6 @@ export default async function handler(req, res) {
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
 
-    // Para propósitos de prueba: mostrar el token recibido
     res.status(200).json({
       message: 'Token recibido exitosamente 🎉',
       tokens
@@ -26,6 +25,10 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Error al intercambiar el código:', error);
-    res.status(500).json({ error: 'Error al intercambiar el código' });
+    res.status(500).json({
+      message: 'Error al intercambiar el código',
+      details: error.message,
+      full: error.response?.data || 'No se pudo acceder al detalle del error.'
+    });
   }
 }
