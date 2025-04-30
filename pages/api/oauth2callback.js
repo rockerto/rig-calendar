@@ -8,9 +8,18 @@ export default async function handler(req, res) {
     return;
   }
 
+  const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env;
+
+  if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+    res.status(500).json({
+      error: 'Faltan las variables de entorno GOOGLE_CLIENT_ID o GOOGLE_CLIENT_SECRET'
+    });
+    return;
+  }
+
   const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
+    GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET,
     'https://rig-calendar.vercel.app/api/oauth2callback'
   );
 
@@ -18,9 +27,13 @@ export default async function handler(req, res) {
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
 
+    // ⚠️ Opcional: imprimir los tokens en consola para copiar el refresh_token
+    console.log('Tokens recibidos:', tokens);
+
     res.status(200).json({
       message: 'Token recibido exitosamente 🎉',
-      tokens
+      refresh_token: tokens.refresh_token ? 'Guardado correctamente ✅' : 'No se recibió refresh_token ❌',
+      note: 'Puedes copiarlo desde consola o desde esta respuesta temporal'
     });
 
   } catch (error) {
