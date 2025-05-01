@@ -12,7 +12,6 @@ const getAvailableAppointments = async (req, res) => {
 
   const { start_date, end_date } = req.body;
 
-  // 🔍 Validar formato de fechas
   if (!isValidDate(start_date) || !isValidDate(end_date)) {
     return res.status(400).json({ error: "Fechas inválidas. Usa formato YYYY-MM-DD" });
   }
@@ -35,7 +34,7 @@ const getAvailableAppointments = async (req, res) => {
 
     const start = new Date(start_date);
     const end = new Date(end_date);
-    end.setDate(end.getDate() + 1); // Para evitar error por rango vacío
+    end.setDate(end.getDate() + 1);
 
     const events = await calendar.freebusy.query({
       requestBody: {
@@ -46,7 +45,7 @@ const getAvailableAppointments = async (req, res) => {
       },
     });
 
-    const busyTimes = events.data.calendars["primary"].busy;
+    const busyTimes = events.data.calendars?.primary?.busy || [];
     const availableAppointments = [];
 
     const appointmentTimes = [
@@ -58,16 +57,15 @@ const getAvailableAppointments = async (req, res) => {
       const dateStr = day.toISOString().split("T")[0];
       for (let time of appointmentTimes) {
         const [hour, minute] = time.split(":");
-        const startDateTime = new Date(day);
-        startDateTime.setHours(parseInt(hour), parseInt(minute), 0, 0);
+        const startDateTime = new Date(`${dateStr}T${time}:00-04:00`);
         const endDateTime = new Date(startDateTime);
         endDateTime.setMinutes(endDateTime.getMinutes() + 30);
 
-        const overlap = busyTimes.some(
-          (busy) =>
-            new Date(busy.start) < endDateTime &&
-            new Date(busy.end) > startDateTime
-        );
+        const overlap = busyTimes.some(busy => {
+          const busyStart = new Date(busy.start);
+          const busyEnd = new Date(busy.end);
+          return busyStart < endDateTime && busyEnd > startDateTime;
+        });
 
         if (!overlap) {
           availableAppointments.push({ date: dateStr, time });
@@ -75,10 +73,11 @@ const getAvailableAppointments = async (req, res) => {
       }
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       availableAppointments,
     });
+
   } catch (error) {
     console.error("Error consultando Google Calendar:", error);
     res.status(500).json({ error: "Error consultando Google Calendar" });
