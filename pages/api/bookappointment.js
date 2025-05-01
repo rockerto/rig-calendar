@@ -5,21 +5,22 @@ const bookAppointment = async (req, res) => {
     return res.status(405).json({ error: "Método no permitido" });
   }
 
-  const { date, time, patient } = req.body;
-
-  // Validación extra: detectar si la fecha coincide con el día de la semana que dice el usuario
-  const today = new Date();
-  const appointmentDate = new Date(date);
-  const dayOfWeek = appointmentDate.toLocaleDateString("es-CL", { weekday: "long" });
-
-  // Evitar agendar días pasados
-  if (appointmentDate < today.setHours(0, 0, 0, 0)) {
-    return res.status(400).json({
-      error: `No se puede agendar una cita en una fecha pasada (${date}).`
-    });
-  }
+  const { date, time, patient, weekday } = req.body;
 
   try {
+    // Validación: ¿el día de la semana coincide con la fecha?
+    if (weekday) {
+      const dias = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+      const fecha = new Date(date);
+      const diaReal = dias[fecha.getDay()];
+      if (diaReal.toLowerCase() !== weekday.toLowerCase()) {
+        return res.status(400).json({
+          error: `La fecha proporcionada (${date}) cae día ${diaReal}, no ${weekday}.`,
+          suggestion: `¿Querías decir ${diaReal} ${date}?`
+        });
+      }
+    }
+
     const credentials = JSON.parse(process.env.GOOGLE_CLIENT_SECRET_JSON);
     const token = JSON.parse(process.env.GOOGLE_TOKEN_JSON);
 
@@ -55,11 +56,7 @@ const bookAppointment = async (req, res) => {
       resource: event,
     });
 
-    return res.status(200).json({
-      success: true,
-      event: response.data,
-      message: `Evento creado para el ${dayOfWeek} ${date} a las ${time} hrs.`,
-    });
+    return res.status(200).json({ success: true, event: response.data });
 
   } catch (error) {
     console.error("Error creando evento en Google Calendar:", error);
