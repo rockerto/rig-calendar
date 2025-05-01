@@ -1,11 +1,23 @@
 import { google } from "googleapis";
 
+const isValidDate = (dateStr) => {
+  const d = new Date(dateStr);
+  return !isNaN(d.getTime());
+};
+
 const getAvailableAppointments = async (req, res) => {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método no permitido" });
   }
 
   const { start_date, end_date } = req.body;
+
+  // 🔍 Validar formato de fechas
+  if (!isValidDate(start_date) || !isValidDate(end_date)) {
+    return res.status(400).json({ error: "Fechas inválidas. Usa formato YYYY-MM-DD" });
+  }
+
+  console.log("Fechas recibidas:", start_date, end_date);
 
   try {
     const credentials = JSON.parse(process.env.GOOGLE_CLIENT_SECRET_JSON);
